@@ -28,6 +28,20 @@ services:
       psql "postgresql://postgres@postgres:5432/rag" -v ON_ERROR_STOP=1
       -c "CREATE EXTENSION IF NOT EXISTS vector;"
     restart: "no"
+  
+  pgadmin:
+    image: elestio/pgadmin:latest
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: alexandredanelon@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: p1word-26
+      SOFTWARE_PASSWORD: p1word-26
+    ports:
+      - "8082:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   postgres_data:

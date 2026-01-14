@@ -1,3 +1,24 @@
+import os
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import OpenAIEmbeddings
+from langchain_postgres import PGVector
+from dotenv import load_dotenv
+
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+OPENAI_EMBEDDING_MODEL = os.getenv("OPENAI_EMBEDDING_MODEL")
+PG_VECTOR_COLLECTION_NAME = os.getenv("PG_VECTOR_COLLECTION_NAME")
+
+embeddings = OpenAIEmbeddings(model=OPENAI_EMBEDDING_MODEL)
+vector_store = PGVector(
+                embeddings=embeddings, 
+                connection=DATABASE_URL, 
+                collection_name=PG_VECTOR_COLLECTION_NAME
+              )
+
+llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0)
+
 PROMPT_TEMPLATE = """
 CONTEXTO:
 {contexto}
@@ -26,4 +47,13 @@ RESPONDA A "PERGUNTA DO USUÁRIO"
 """
 
 def search_prompt(question=None):
-    pass
+    if question is None:
+        raise ValueError("Question is required")
+    
+    docs = vector_store.similarity_search(question, k=10)
+    contexto = "\n\n".join([doc.page_content for doc in docs])
+    
+    prompt = PROMPT_TEMPLATE.format(contexto=contexto, pergunta=question)
+    response = llm.invoke(prompt)
+    return response.content
+    
