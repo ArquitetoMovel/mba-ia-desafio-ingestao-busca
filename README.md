@@ -11,6 +11,15 @@ docker compose up -d
 
 Crie um `.env` conforme [exemplo](.env.exemple)
 
+### Exemplo de preenchimento das variáveis de ambiente
+
+- PG_VECTOR_COLLECTION_NAME=mbai_desafio_rag_coll
+- PDF_PATH=document.pdf
+- DATABASE_URL=postgresql://{pg_user}:{pg_pass}@localhost:5432/rag
+- OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+- OPENAI_API_KEY={sua key}
+- GOOGLE_API_KEY={sua key}
+
 ## Passos para executar a aplicação
 
 ### 1. Ingestão de dados
